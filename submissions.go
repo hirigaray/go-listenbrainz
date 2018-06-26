@@ -103,7 +103,7 @@ func SubmitRequest(json []byte, token string) (*http.Response, error) {
 	return resp, nil
 }
 
-// SubmitPlayingNow posts the given Status to ListenBrainz as what's playing now.
+// SubmitPlayingNow posts the given track to ListenBrainz as what's playing now.
 func SubmitPlayingNow(t Track, token string) (*http.Response, error) {
 	j, err := FormatAsJSON(t, "playing_now")
 	if err != nil {
@@ -118,7 +118,7 @@ func SubmitPlayingNow(t Track, token string) (*http.Response, error) {
 	return response, nil
 }
 
-// SubmitSingle posts the given Status to ListenBrainz as a single listen.
+// SubmitSingle posts the given track to ListenBrainz as a single listen.
 func SubmitSingle(t Track, token string) (*http.Response, error) {
 	j, err := FormatAsJSON(t, "single")
 	if err != nil {
