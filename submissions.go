@@ -31,9 +31,9 @@ type Track struct {
 }
 
 // FormatSingle formats a Track as a single Submission.
-func FormatSingle(t Track) Submission {
+func FormatPlayingNow(t Track) Submission {
 	return Submission{
-		ListenType: "single",
+		ListenType: "playing_now",
 		Payloads: Payloads{
 			Payload{
 				Track: t,
@@ -43,9 +43,9 @@ func FormatSingle(t Track) Submission {
 }
 
 // FormatPlayingNow formats a Track as a playing_now Submission.
-func FormatPlayingNow(t Track) Submission {
+func FormatSingle(t Track) Submission {
 	return Submission{
-		ListenType: "playing_now",
+		ListenType: "single",
 		Payloads: Payloads{
 			Payload{
 				ListenedAt: int(time.Now().Unix()),

@@ -1,22 +1,45 @@
 package listenbrainz
 
 import (
-	"log"
+	"reflect"
 	"testing"
 )
 
-func TestFormatAsJSON(t *testing.T) {
+func TestGetSubmissionTime(t *testing.T) {
+	var tests = []struct {
+		Length, Result int
+	}{
+		{100, 50},
+		{1000, 240},
+	}
+
+	for _, test := range tests {
+		st := GetSubmissionTime(test.Length)
+		if st != test.Result {
+			t.Error("Expected", test.Result, "got", st)
+		}
+	}
+}
+
+func TestFormatPlayingNow(t *testing.T) {
 	track := Track{
 		"a",
 		"b",
 		"c",
 	}
-	json, err := FormatAsJSON(track, "playing_now")
-	if err != nil {
-		log.Fatalln(err)
+
+	ts := Submission{
+		ListenType: "playing_now",
+		Payloads: Payloads{
+			Payload{
+				Track: track,
+			},
+		},
 	}
 
-	if string(json) != `{"listen_type":"playing_now","payload":[{"track_metadata":{"track_name":"a","artist_name":"b","release_name":"c"}}]}` {
-		t.Error(`Expected "{"listen_type":"playing_now","payload":[{"track_metadata":{"track_name":"a","artist_name":"b","release_name":"c"}}]}", got `, json)
+	s := FormatPlayingNow(track)
+
+	if !reflect.DeepEqual(ts, s) {
+		t.Error("Expected", ts, "got", s)
 	}
 }
