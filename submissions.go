@@ -3,7 +3,6 @@ package listenbrainz
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"math"
 	"net/http"
 	"time"
@@ -31,41 +30,45 @@ type Track struct {
 	Album  string `json:"release_name"`
 }
 
-// format listen info as JSON for ListenBrainz
-func FormatAsJSON(t Track, listenType string) ([]byte, error) {
-	// insert values into struct
-	var p Payload
-	if listenType == "playing_now" {
-		p = Payload{Track: t}
-	} else if listenType == "single" {
-		p = Payload{
-			ListenedAt: int(time.Now().Unix()),
-			Track:      t,
-		}
-	} else {
-		// there's nothing to return
-		return nil, errors.New("Unrecognized listen type.")
-	}
-
-	sp := Submission{
-		ListenType: listenType,
+// FormatSingle formats a Track as a single Submission.
+func FormatSingle(t Track) Submission {
+	return Submission{
+		ListenType: "single",
 		Payloads: Payloads{
-			p,
+			Payload{
+				Track: t,
+			},
 		},
 	}
+}
 
-	// convert struct to JSON and return it
-	pm, err := json.Marshal(sp)
+// FormatPlayingNow formats a Track as a playing_now Submission.
+func FormatPlayingNow(t Track) Submission {
+	return Submission{
+		ListenType: "playing_now",
+		Payloads: Payloads{
+			Payload{
+				ListenedAt: int(time.Now().Unix()),
+				Track:      t,
+			},
+		},
+	}
+}
+
+// SubmissionToJSON serializes a Submission as JSON.
+func SubmissionToJSON(s Submission) ([]byte, error) {
+	pm, err := json.Marshal(s)
 	if err != nil {
 		return nil, err
 	}
 	return pm, nil
 }
 
-// GetSubmissionTime returns the number of seconds after which a track should be submitted.
-func GetSubmissionTime(length int) (int, error) {
-	hp := int(math.Floor(length / 2))
-
+// GetSubmissionTime returns the number of seconds after which a track should be
+// submitted.
+func GetSubmissionTime(length int) int {
+	// get halfway point
+	hp := int(math.Floor(float64(length / 2.0)))
 	// source: https://listenbrainz.readthedocs.io/en/latest/dev/api.html
 	// Listens should be submitted for tracks when the user has listened to
 	// half the track or 4 minutes of the track, whichever is lower. If the
@@ -77,10 +80,11 @@ func GetSubmissionTime(length int) (int, error) {
 	} else {
 		st = hp
 	}
-	return st, nil
+	return st
 }
 
-// SubmitRequest creates and executes a request based on the JSON passed, to the account delineated by the token.
+// SubmitRequest creates and executes a request based on the JSON passed,
+// to the account delineated by the token.
 func SubmitRequest(json []byte, token string) (*http.Response, error) {
 	url := "https://api.listenbrainz.org/1/submit-listens"
 
@@ -105,7 +109,7 @@ func SubmitRequest(json []byte, token string) (*http.Response, error) {
 
 // SubmitPlayingNow posts the given track to ListenBrainz as what's playing now.
 func SubmitPlayingNow(t Track, token string) (*http.Response, error) {
-	j, err := FormatAsJSON(t, "playing_now")
+	j, err := SubmissionToJSON(FormatPlayingNow(t))
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +124,7 @@ func SubmitPlayingNow(t Track, token string) (*http.Response, error) {
 
 // SubmitSingle posts the given track to ListenBrainz as a single listen.
 func SubmitSingle(t Track, token string) (*http.Response, error) {
-	j, err := FormatAsJSON(t, "single")
+	j, err := SubmissionToJSON(FormatSingle(t))
 	if err != nil {
 		return nil, err
 	}
