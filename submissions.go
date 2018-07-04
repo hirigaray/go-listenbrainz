@@ -59,19 +59,16 @@ func FormatSingle(t Track) Submission {
 // submitted.
 func GetSubmissionTime(length int) int {
 	// get halfway point
-	hp := int(math.Floor(float64(length / 2.0)))
+	p := int(math.Floor(float64(length / 2.0)))
 	// source: https://listenbrainz.readthedocs.io/en/latest/dev/api.html
 	// Listens should be submitted for tracks when the user has listened to
 	// half the track or 4 minutes of the track, whichever is lower. If the
 	// user hasn’t listened to 4 minutes or half the track, it doesn’t fully
 	// count as a listen and should not be submitted.
-	var st int
-	if hp > 240 {
-		st = 240
-	} else {
-		st = hp
+	if p > 240 {
+		p = 240
 	}
-	return st
+	return p
 }
 
 // SubmitRequest creates and executes a request based on the JSON passed,
