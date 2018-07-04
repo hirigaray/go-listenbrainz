@@ -55,15 +55,6 @@ func FormatSingle(t Track) Submission {
 	}
 }
 
-// SubmissionToJSON serializes a Submission as JSON.
-func SubmissionToJSON(s Submission) ([]byte, error) {
-	pm, err := json.Marshal(s)
-	if err != nil {
-		return nil, err
-	}
-	return pm, nil
-}
-
 // GetSubmissionTime returns the number of seconds after which a track should be
 // submitted.
 func GetSubmissionTime(length int) int {
@@ -109,7 +100,7 @@ func SubmitRequest(json []byte, token string) (*http.Response, error) {
 
 // SubmitPlayingNow posts the given track to ListenBrainz as what's playing now.
 func SubmitPlayingNow(t Track, token string) (*http.Response, error) {
-	j, err := SubmissionToJSON(FormatPlayingNow(t))
+	j, err := json.Marshal(FormatPlayingNow(t))
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +115,7 @@ func SubmitPlayingNow(t Track, token string) (*http.Response, error) {
 
 // SubmitSingle posts the given track to ListenBrainz as a single listen.
 func SubmitSingle(t Track, token string) (*http.Response, error) {
-	j, err := SubmissionToJSON(FormatSingle(t))
+	j, err := json.Marshal(FormatSingle(t))
 	if err != nil {
 		return nil, err
 	}
