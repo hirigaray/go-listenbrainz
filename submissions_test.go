@@ -23,9 +23,9 @@ func TestGetSubmissionTime(t *testing.T) {
 
 func TestFormatPlayingNow(t *testing.T) {
 	track := Track{
-		"a",
-		"b",
-		"c",
+		Title:  "b",
+		Artist: "a",
+		Album:  "c",
 	}
 
 	ts := Submission{

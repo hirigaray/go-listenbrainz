@@ -3,7 +3,6 @@ package listenbrainz
 import (
 	"bytes"
 	"encoding/json"
-	"math"
 	"net/http"
 	"time"
 )
@@ -59,7 +58,7 @@ func FormatSingle(t Track) Submission {
 // submitted.
 func GetSubmissionTime(length int) int {
 	// get halfway point
-	p := int(math.Floor(float64(length / 2.0)))
+	p := int(float64(length / 2.0))
 	// source: https://listenbrainz.readthedocs.io/en/latest/dev/api.html
 	// Listens should be submitted for tracks when the user has listened to
 	// half the track or 4 minutes of the track, whichever is lower. If the
@@ -86,12 +85,11 @@ func SubmitRequest(json []byte, token string) (*http.Response, error) {
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
-
 	if err != nil {
 		return nil, err
 	}
 
+	resp.Body.Close()
 	return resp, nil
 }
 
