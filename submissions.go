@@ -65,8 +65,9 @@ func GetSubmissionTime(length int) int {
 	// user hasn’t listened to 4 minutes or half the track, it doesn’t fully
 	// count as a listen and should not be submitted.
 	if p > 240 {
-		p = 240
+		return 240
 	}
+
 	return p
 }
 
@@ -100,12 +101,7 @@ func SubmitPlayingNow(t Track, token string) (*http.Response, error) {
 		return nil, err
 	}
 
-	response, err := SubmitRequest(j, token)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
+	return SubmitRequest(j, token)
 }
 
 // SubmitSingle posts the given track to ListenBrainz as a single listen.
@@ -115,10 +111,5 @@ func SubmitSingle(t Track, token string) (*http.Response, error) {
 		return nil, err
 	}
 
-	response, err := SubmitRequest(j, token)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
+	return SubmitRequest(j, token)
 }
