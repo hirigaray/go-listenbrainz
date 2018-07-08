@@ -3,6 +3,7 @@ package listenbrainz
 import (
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestGetSubmissionTime(t *testing.T) {
@@ -38,6 +39,32 @@ func TestFormatPlayingNow(t *testing.T) {
 	}
 
 	s := FormatPlayingNow(track)
+
+	if !reflect.DeepEqual(ts, s) {
+		t.Error("Expected", ts, "got", s)
+	}
+}
+
+func TestFormatSingle(t *testing.T) {
+	track := Track{
+		Title:  "b",
+		Artist: "a",
+		Album:  "c",
+	}
+
+	time := time.Now().Unix()
+
+	ts := Submission{
+		ListenType: "single",
+		Payloads: Payloads{
+			Payload{
+				ListenedAt: time,
+				Track:      track,
+			},
+		},
+	}
+
+	s := FormatSingle(track, time)
 
 	if !reflect.DeepEqual(ts, s) {
 		t.Error("Expected", ts, "got", s)

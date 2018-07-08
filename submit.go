@@ -18,7 +18,7 @@ type Payloads []Payload
 
 // Payload is a helper struct for marshalling the JSON payload
 type Payload struct {
-	ListenedAt int `json:"listened_at,omitempty"`
+	ListenedAt int64 `json:"listened_at,omitempty"`
 	Track      `json:"track_metadata"`
 }
 
@@ -42,13 +42,13 @@ func FormatPlayingNow(t Track) Submission {
 }
 
 // FormatPlayingNow formats a Track as a playing_now Submission.
-func FormatSingle(t Track) Submission {
+func FormatSingle(track Track, time int64) Submission {
 	return Submission{
 		ListenType: "single",
 		Payloads: Payloads{
 			Payload{
-				ListenedAt: int(time.Now().Unix()),
-				Track:      t,
+				ListenedAt: time,
+				Track:      track,
 			},
 		},
 	}
@@ -106,7 +106,7 @@ func SubmitPlayingNow(t Track, token string) (*http.Response, error) {
 
 // SubmitSingle posts the given track to ListenBrainz as a single listen.
 func SubmitSingle(t Track, token string) (*http.Response, error) {
-	j, err := json.Marshal(FormatSingle(t))
+	j, err := json.Marshal(FormatSingle(t, time.Now().Unix()))
 	if err != nil {
 		return nil, err
 	}
