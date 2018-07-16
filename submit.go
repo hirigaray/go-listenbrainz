@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"time"
 )
 
 // Submission is a struct for marshalling the JSON payload
@@ -30,12 +29,12 @@ type Track struct {
 }
 
 // FormatSingle formats a Track as a single Submission.
-func FormatPlayingNow(t Track) Submission {
+func FormatPlayingNow(track Track) Submission {
 	return Submission{
 		ListenType: "playing_now",
 		Payloads: Payloads{
 			Payload{
-				Track: t,
+				Track: track,
 			},
 		},
 	}
@@ -95,21 +94,21 @@ func SubmitRequest(json []byte, token string) (*http.Response, error) {
 }
 
 // SubmitPlayingNow posts the given track to ListenBrainz as what's playing now.
-func SubmitPlayingNow(t Track, token string) (*http.Response, error) {
-	j, err := json.Marshal(FormatPlayingNow(t))
+func SubmitPlayingNow(track Track, token string) (*http.Response, error) {
+	json, err := json.Marshal(FormatPlayingNow(track))
 	if err != nil {
 		return nil, err
 	}
 
-	return SubmitRequest(j, token)
+	return SubmitRequest(json, token)
 }
 
-// SubmitSingle posts the given track to ListenBrainz as a single listen.
-func SubmitSingle(t Track, token string) (*http.Response, error) {
-	j, err := json.Marshal(FormatSingle(t, time.Now().Unix()))
+// SubmitSingle posts the given track to ListenBrainz as a single listen with the given time.
+func SubmitSingle(track Track, token string, time int64) (*http.Response, error) {
+	json, err := json.Marshal(FormatSingle(track, time))
 	if err != nil {
 		return nil, err
 	}
 
-	return SubmitRequest(j, token)
+	return SubmitRequest(json, token)
 }
