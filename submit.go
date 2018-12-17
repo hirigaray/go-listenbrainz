@@ -3,6 +3,7 @@ package listenbrainz
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -55,7 +56,11 @@ func FormatSingle(track Track, time int64) Submission {
 
 // GetSubmissionTime returns the number of seconds after which a track
 // should be submitted.
-func GetSubmissionTime(length int) int {
+func GetSubmissionTime(length int) (int, error) {
+	if length < 0 {
+		return 0, errors.New("Length can't be negative.")
+	}
+
 	// get halfway point
 	p := int(float64(length / 2.0))
 	// source: https://listenbrainz.readthedocs.io/en/latest/dev/api.html
@@ -64,10 +69,10 @@ func GetSubmissionTime(length int) int {
 	// user hasn’t listened to 4 minutes or half the track, it doesn’t fully
 	// count as a listen and should not be submitted.
 	if p > 240 {
-		return 240
+		return 240, nil
 	}
 
-	return p
+	return p, nil
 }
 
 // SubmitRequest creates and executes a request containing the JSON that's passed,
