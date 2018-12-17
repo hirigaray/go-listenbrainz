@@ -17,7 +17,10 @@ func TestGetSubmissionTime(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		st := GetSubmissionTime(test.Length)
+		st, err := GetSubmissionTime(test.Length)
+		if err != nil {
+			t.Log("Test failed successfully at:", test.Length, ":", err)
+		}
 		if st != test.Result {
 			t.Error("Expected", test.Result, "got", st)
 		}
