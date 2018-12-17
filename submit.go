@@ -28,7 +28,7 @@ type Track struct {
 	Album  string `json:"release_name"`
 }
 
-// FormatSingle formats a Track as a single Submission.
+// FormatPlayingNow formats a Track as a playing_now Submission.
 func FormatPlayingNow(track Track) Submission {
 	return Submission{
 		ListenType: "playing_now",
@@ -40,7 +40,7 @@ func FormatPlayingNow(track Track) Submission {
 	}
 }
 
-// FormatPlayingNow formats a Track as a playing_now Submission.
+// FormatSingle formats a Track as a single Submission.
 func FormatSingle(track Track, time int64) Submission {
 	return Submission{
 		ListenType: "single",
@@ -53,8 +53,8 @@ func FormatSingle(track Track, time int64) Submission {
 	}
 }
 
-// GetSubmissionTime returns the number of seconds after which a track should be
-// submitted.
+// GetSubmissionTime returns the number of seconds after which a track
+// should be submitted.
 func GetSubmissionTime(length int) int {
 	// get halfway point
 	p := int(float64(length / 2.0))
@@ -70,7 +70,7 @@ func GetSubmissionTime(length int) int {
 	return p
 }
 
-// SubmitRequest creates and executes a request based on the JSON passed,
+// SubmitRequest creates and executes a request containing the JSON that's passed,
 // to the account delineated by the token.
 func SubmitRequest(json []byte, token string) (*http.Response, error) {
 	url := "https://api.listenbrainz.org/1/submit-listens"
@@ -84,13 +84,7 @@ func SubmitRequest(json []byte, token string) (*http.Response, error) {
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	resp.Body.Close()
-	return resp, nil
+	return client.Do(req)
 }
 
 // SubmitPlayingNow posts the given track to ListenBrainz as what's playing now.
@@ -103,7 +97,8 @@ func SubmitPlayingNow(track Track, token string) (*http.Response, error) {
 	return SubmitRequest(json, token)
 }
 
-// SubmitSingle posts the given track to ListenBrainz as a single listen with the given time.
+// SubmitSingle posts the given track to ListenBrainz as a single listen
+// with the given time.
 func SubmitSingle(track Track, token string, time int64) (*http.Response, error) {
 	json, err := json.Marshal(FormatSingle(track, time))
 	if err != nil {
