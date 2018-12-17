@@ -1,6 +1,7 @@
 package listenbrainz
 
 import (
+	"math"
 	"reflect"
 	"testing"
 	"time"
@@ -10,8 +11,9 @@ func TestGetSubmissionTime(t *testing.T) {
 	var tests = []struct {
 		Length, Result int
 	}{
-		{100, 50},
-		{1000, 240},
+		{-1, 0},
+		{128, 64},
+		{math.MaxInt64, 240},
 	}
 
 	for _, test := range tests {
