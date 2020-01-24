@@ -73,7 +73,7 @@ func FormatSingle(track Track, time int64) Submission {
 // should be submitted.
 func GetSubmissionTime(length int) (int, error) {
 	if length < 0 {
-		return 0, errors.New("Length can't be negative.")
+		return 0, errors.New("length can't be negative")
 	}
 
 	// get halfway point
