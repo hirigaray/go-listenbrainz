@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Luiz de Milon (kori)
+// Copyright (C) 2023 Luiz de Milon (kori)
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 )
 
 // Submission is a struct for marshalling the JSON payload
@@ -71,23 +72,21 @@ func FormatSingle(track Track, time int64) Submission {
 
 // GetSubmissionTime returns the number of seconds after which a track
 // should be submitted.
-func GetSubmissionTime(length int) (int, error) {
-	if length < 0 {
-		return 0, errors.New("length can't be negative")
+func GetSubmissionTime(d time.Duration) (time.Duration, error) {
+	if d < 0 {
+		return time.Duration(0), errors.New("length can't be negative")
 	}
 
-	// get halfway point
-	p := int(float64(length / 2.0))
 	// source: https://listenbrainz.readthedocs.io/en/latest/dev/api.html
 	// Listens should be submitted for tracks when the user has listened to
 	// half the track or 4 minutes of the track, whichever is lower. If the
 	// user hasn’t listened to 4 minutes or half the track, it doesn’t fully
 	// count as a listen and should not be submitted.
-	if p > 240 {
-		return 240, nil
+	if hp := d / 2; hp > 4*time.Minute {
+		return 4 * time.Minute, nil
+	} else {
+		return hp, nil
 	}
-
-	return p, nil
 }
 
 // SubmitRequest creates and executes a request containing the JSON that's passed,
